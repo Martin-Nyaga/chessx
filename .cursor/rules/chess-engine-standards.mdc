@@ -53,7 +53,7 @@ alwaysApply: true
 - Keep commit messages short, ideally one line unless absolutely necessary
 - Use clear, descriptive commit messages that explain what was changed
 - Focus on the main change, not implementation details
-- Always use a footer "Authored by Cursor" when committing
+- Always use a footer "Authored by Cursor" when committing. Use a multiline string to make sure it appears on a separate line, with a newline preceding it.
 - Always use --no-gpg-sign flag when committing
 
 ## Naming Conventions (Rays, Moves, Squares)
