@@ -97,11 +97,11 @@ func TestDiagonalAttacksInvalidInput(t *testing.T) {
 func TestGetValidDiagonalMoves(t *testing.T) {
 	pos := NewPosition()
 
-	pos.SetPiece(0, 0, Bishop, White)
-	pos.SetPiece(1, 1, Pawn, Black)
-	pos.SetPiece(2, 2, Pawn, White)
+	pos.SetPieceAtSquare("a1", Bishop, White)
+	pos.SetPieceAtSquare("b2", Pawn, Black)
+	pos.SetPieceAtSquare("c3", Pawn, White)
 
-	bishop := pos.GetPiece(0, 0)
+	bishop := pos.GetPieceAtSquare("a1")
 	moves := GetValidDiagonalMoves(pos, bishop)
 	squares := moves.ToSquares()
 

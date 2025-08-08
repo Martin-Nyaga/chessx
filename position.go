@@ -181,6 +181,24 @@ func (p *Position) GetAllOccupancy() Bitboard {
 	return p.whiteOccupancy.Or(p.blackOccupancy)
 }
 
+func (p *Position) GetPieceAtSquare(square string) *Piece {
+	if len(square) != 2 {
+		return nil
+	}
+	file := int(square[0] - 'a')
+	rank := int(square[1] - '1')
+	return p.GetPiece(file, rank)
+}
+
+func (p *Position) SetPieceAtSquare(square string, kind PieceKind, color Color) {
+	if len(square) != 2 {
+		return
+	}
+	file := int(square[0] - 'a')
+	rank := int(square[1] - '1')
+	p.SetPiece(file, rank, kind, color)
+}
+
 func (p *Position) String() string {
 	var sb strings.Builder
 

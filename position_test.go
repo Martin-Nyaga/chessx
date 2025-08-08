@@ -12,38 +12,40 @@ func TestPositionCreation(t *testing.T) {
 
 	// Set up a sample position (starting position)
 	// White pieces on rank 1
-	pos.SetPiece(0, 0, Rook, White)
-	pos.SetPiece(1, 0, Knight, White)
-	pos.SetPiece(2, 0, Bishop, White)
-	pos.SetPiece(3, 0, Queen, White)
-	pos.SetPiece(4, 0, King, White)
-	pos.SetPiece(5, 0, Bishop, White)
-	pos.SetPiece(6, 0, Knight, White)
-	pos.SetPiece(7, 0, Rook, White)
+	pos.SetPieceAtSquare("a1", Rook, White)
+	pos.SetPieceAtSquare("b1", Knight, White)
+	pos.SetPieceAtSquare("c1", Bishop, White)
+	pos.SetPieceAtSquare("d1", Queen, White)
+	pos.SetPieceAtSquare("e1", King, White)
+	pos.SetPieceAtSquare("f1", Bishop, White)
+	pos.SetPieceAtSquare("g1", Knight, White)
+	pos.SetPieceAtSquare("h1", Rook, White)
 
 	// White pawns on rank 2
 	for file := 0; file < 8; file++ {
-		pos.SetPiece(file, 1, Pawn, White)
+		square := fmt.Sprintf("%c2", 'a'+file)
+		pos.SetPieceAtSquare(square, Pawn, White)
 	}
 
 	// Black pieces on rank 8
-	pos.SetPiece(0, 7, Rook, Black)
-	pos.SetPiece(1, 7, Knight, Black)
-	pos.SetPiece(2, 7, Bishop, Black)
-	pos.SetPiece(3, 7, Queen, Black)
-	pos.SetPiece(4, 7, King, Black)
-	pos.SetPiece(5, 7, Bishop, Black)
-	pos.SetPiece(6, 7, Knight, Black)
-	pos.SetPiece(7, 7, Rook, Black)
+	pos.SetPieceAtSquare("a8", Rook, Black)
+	pos.SetPieceAtSquare("b8", Knight, Black)
+	pos.SetPieceAtSquare("c8", Bishop, Black)
+	pos.SetPieceAtSquare("d8", Queen, Black)
+	pos.SetPieceAtSquare("e8", King, Black)
+	pos.SetPieceAtSquare("f8", Bishop, Black)
+	pos.SetPieceAtSquare("g8", Knight, Black)
+	pos.SetPieceAtSquare("h8", Rook, Black)
 
 	// Black pawns on rank 7
 	for file := 0; file < 8; file++ {
-		pos.SetPiece(file, 6, Pawn, Black)
+		square := fmt.Sprintf("%c7", 'a'+file)
+		pos.SetPieceAtSquare(square, Pawn, Black)
 	}
 
 	// Set some additional pieces for demonstration
-	pos.SetPiece(3, 3, Queen, White)  // White queen in center
-	pos.SetPiece(4, 4, Bishop, Black) // Black bishop in center
+	pos.SetPieceAtSquare("d4", Queen, White)  // White queen in center
+	pos.SetPieceAtSquare("e5", Bishop, Black) // Black bishop in center
 
 	// Set the position to White's turn, move 5
 	pos.SetToMove(White)
@@ -55,15 +57,15 @@ func TestPositionCreation(t *testing.T) {
 	}
 
 	// Verify some pieces are in the correct positions
-	if piece := pos.GetPiece(0, 0); piece == nil || piece.Kind != Rook || piece.Color != White {
+	if piece := pos.GetPieceAtSquare("a1"); piece == nil || piece.Kind != Rook || piece.Color != White {
 		t.Errorf("Expected white rook at a1, got %v", piece)
 	}
 
-	if piece := pos.GetPiece(4, 7); piece == nil || piece.Kind != King || piece.Color != Black {
+	if piece := pos.GetPieceAtSquare("e8"); piece == nil || piece.Kind != King || piece.Color != Black {
 		t.Errorf("Expected black king at e8, got %v", piece)
 	}
 
-	if piece := pos.GetPiece(3, 3); piece == nil || piece.Kind != Queen || piece.Color != White {
+	if piece := pos.GetPieceAtSquare("d4"); piece == nil || piece.Kind != Queen || piece.Color != White {
 		t.Errorf("Expected white queen at d4, got %v", piece)
 	}
 }
@@ -275,9 +277,9 @@ func TestOccupancyBitboards(t *testing.T) {
 	}
 
 	// Test adding white pieces
-	pos.SetPiece(0, 0, Rook, White)
-	pos.SetPiece(1, 0, Knight, White)
-	pos.SetPiece(2, 0, Bishop, White)
+	pos.SetPieceAtSquare("a1", Rook, White)
+	pos.SetPieceAtSquare("b1", Knight, White)
+	pos.SetPieceAtSquare("c1", Bishop, White)
 
 	whiteOccupancy := pos.GetWhiteOccupancy()
 	if whiteOccupancy.Count() != 3 {
@@ -294,9 +296,9 @@ func TestOccupancyBitboards(t *testing.T) {
 	}
 
 	// Test adding black pieces
-	pos.SetPiece(0, 7, Rook, Black)
-	pos.SetPiece(1, 7, Knight, Black)
-	pos.SetPiece(2, 7, Bishop, Black)
+	pos.SetPieceAtSquare("a8", Rook, Black)
+	pos.SetPieceAtSquare("b8", Knight, Black)
+	pos.SetPieceAtSquare("c8", Bishop, Black)
 
 	blackOccupancy := pos.GetBlackOccupancy()
 	if blackOccupancy.Count() != 3 {
@@ -319,7 +321,7 @@ func TestOccupancyBitboards(t *testing.T) {
 	}
 
 	// Test replacing pieces
-	pos.SetPiece(0, 0, Queen, White) // Replace white rook with queen
+	pos.SetPieceAtSquare("a1", Queen, White) // Replace white rook with queen
 	whiteOccupancy = pos.GetWhiteOccupancy()
 	if whiteOccupancy.Count() != 3 {
 		t.Errorf("Expected still 3 white pieces after replacement, got %d", whiteOccupancy.Count())
@@ -329,7 +331,7 @@ func TestOccupancyBitboards(t *testing.T) {
 	}
 
 	// Test removing pieces
-	pos.SetPiece(0, 0, Empty, White) // Remove piece
+	pos.SetPieceAtSquare("a1", Empty, White) // Remove piece
 	whiteOccupancy = pos.GetWhiteOccupancy()
 	if whiteOccupancy.Count() != 2 {
 		t.Errorf("Expected 2 white pieces after removal, got %d", whiteOccupancy.Count())
@@ -339,7 +341,7 @@ func TestOccupancyBitboards(t *testing.T) {
 	}
 
 	// Test replacing with different color
-	pos.SetPiece(1, 0, Bishop, Black) // Replace white knight with black bishop
+	pos.SetPieceAtSquare("b1", Bishop, Black) // Replace white knight with black bishop
 	whiteOccupancy = pos.GetWhiteOccupancy()
 	blackOccupancy = pos.GetBlackOccupancy()
 	if whiteOccupancy.Count() != 1 {

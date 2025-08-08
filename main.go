@@ -36,14 +36,14 @@ func main() {
 	fmt.Println("=====================================================")
 
 	testPos := NewPosition()
-	testPos.SetPiece(0, 0, Rook, White)
-	testPos.SetPiece(1, 0, Pawn, Black)
-	testPos.SetPiece(0, 1, Pawn, White)
+	testPos.SetPieceAtSquare("a1", Rook, White)
+	testPos.SetPieceAtSquare("b1", Pawn, Black)
+	testPos.SetPieceAtSquare("a2", Pawn, White)
 
 	fmt.Println("Position with White Rook at a1, Black Pawn at b1, White Pawn at a2:")
 	fmt.Println(testPos.String())
 
-	rook := testPos.GetPiece(0, 0)
+	rook := testPos.GetPieceAtSquare("a1")
 	moves := GetValidOrthogonalMoves(testPos, rook)
 	fmt.Printf("Valid moves for Rook at a1: %s\n", strings.Join(moves.ToSquares(), " "))
 	fmt.Printf("  Bitboard:\n%s", moves.String())
@@ -65,14 +65,14 @@ func main() {
 	fmt.Println("==================================================")
 
 	testPos2 := NewPosition()
-	testPos2.SetPiece(0, 0, Bishop, White)
-	testPos2.SetPiece(1, 1, Pawn, Black)
-	testPos2.SetPiece(2, 2, Pawn, White)
+	testPos2.SetPieceAtSquare("a1", Bishop, White)
+	testPos2.SetPieceAtSquare("b2", Pawn, Black)
+	testPos2.SetPieceAtSquare("c3", Pawn, White)
 
 	fmt.Println("Position with White Bishop at a1, Black Pawn at b2, White Pawn at c3:")
 	fmt.Println(testPos2.String())
 
-	bishop := testPos2.GetPiece(0, 0)
+	bishop := testPos2.GetPieceAtSquare("a1")
 	moves2 := GetValidDiagonalMoves(testPos2, bishop)
 	fmt.Printf("Valid moves for Bishop at a1: %s\n", strings.Join(moves2.ToSquares(), " "))
 	fmt.Printf("  Bitboard:\n%s", moves2.String())

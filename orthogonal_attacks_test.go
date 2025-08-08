@@ -78,11 +78,11 @@ func TestOrthogonalAttacksInvalidInput(t *testing.T) {
 func TestGetValidOrthogonalMoves(t *testing.T) {
 	pos := NewPosition()
 
-	pos.SetPiece(0, 0, Rook, White)
-	pos.SetPiece(1, 0, Pawn, Black)
-	pos.SetPiece(0, 1, Pawn, White)
+	pos.SetPieceAtSquare("a1", Rook, White)
+	pos.SetPieceAtSquare("b1", Pawn, Black)
+	pos.SetPieceAtSquare("a2", Pawn, White)
 
-	rook := pos.GetPiece(0, 0)
+	rook := pos.GetPieceAtSquare("a1")
 	moves := GetValidOrthogonalMoves(pos, rook)
 	squares := moves.ToSquares()
 

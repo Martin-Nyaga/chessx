@@ -42,3 +42,8 @@
 - Provide direct, actionable responses without summarizing what was done
 - Focus on the current task and next steps only
 - Avoid phrases like "In summary", "To recap", "In conclusion", etc.
+
+## Commit Guidelines
+- Keep commit messages short, ideally one line unless absolutely necessary
+- Use clear, descriptive commit messages that explain what was changed
+- Focus on the main change, not implementation details
