@@ -37,13 +37,7 @@ func (b Bitboard) Toggle(index uint64) Bitboard {
 }
 
 func (b Bitboard) Count() int {
-	count := 0
-	for i := uint64(0); i < 64; i++ {
-		if b.IsSet(i) {
-			count++
-		}
-	}
-	return count
+	return bits.OnesCount64(uint64(b))
 }
 
 func (b Bitboard) FirstSet() uint64 {

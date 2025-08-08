@@ -114,4 +114,40 @@ func main() {
 	knightMoves := GetValidKnightMoves(testPos3, knight)
 	fmt.Printf("Valid moves for Knight at e4: %s\n", strings.Join(knightMoves.ToSquares(), " "))
 	fmt.Printf("  Bitboard:\n%s", knightMoves.String())
+
+	fmt.Println()
+	fmt.Println("King Attack Patterns:")
+	fmt.Println("=====================")
+	exampleSquares = []string{"a1", "e4", "h8"}
+	for _, square := range exampleSquares {
+		attacks := GetKingAttacksFromSquare(square)
+		fmt.Printf("King at %s can attack:\n", square)
+		fmt.Printf("  Squares: %s\n", strings.Join(attacks.ToSquares(), " "))
+		fmt.Printf("  Bitboard:\n%s", attacks.String())
+		fmt.Println()
+	}
+
+	fmt.Println("Valid King Moves (ignoring check rules):")
+	fmt.Println("=======================================")
+	testPos4 := NewPosition()
+	testPos4.SetPieceAtSquare("e4", King, White)
+	testPos4.SetPieceAtSquare("e5", Pawn, White)
+	testPos4.SetPieceAtSquare("f5", Pawn, Black)
+	king := testPos4.GetPieceAtSquare("e4")
+	kingMoves := GetValidKingMoves(testPos4, king)
+	fmt.Printf("Valid moves for King at e4: %s\n", strings.Join(kingMoves.ToSquares(), " "))
+	fmt.Printf("  Bitboard:\n%s", kingMoves.String())
+
+	fmt.Println()
+	fmt.Println("Valid Pawn Moves (with en passant if available):")
+	fmt.Println("===============================================")
+	// White en passant example: ep square on d6, white pawn from e5 can capture en passant to d6
+	testPos5 := NewPosition()
+	testPos5.SetPieceAtSquare("e5", Pawn, White)
+	testPos5.SetPieceAtSquare("d5", Pawn, Black)
+	testPos5.SetEnpassant(fileRankToIndex(3, 5)) // d6
+	pawn := testPos5.GetPieceAtSquare("e5")
+	pawnMoves := GetValidPawnMoves(testPos5, pawn)
+	fmt.Printf("Valid moves for Pawn at e5: %s\n", strings.Join(pawnMoves.ToSquares(), " "))
+	fmt.Printf("  Bitboard:\n%s", pawnMoves.String())
 }

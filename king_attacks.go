@@ -1,7 +1,6 @@
 package main
 
-// KnightAttacks stores precomputed attack bitboards for a knight from each square
-var KnightAttacks [64]Bitboard
+var KingAttacks [64]Bitboard
 
 func init() {
 	for index := uint64(0); index < 64; index++ {
@@ -9,10 +8,9 @@ func init() {
 		attacksMask := EmptyBitboard()
 
 		moveDeltas := [8][2]int{
-			{1, 2}, {2, 1}, {2, -1}, {1, -2},
-			{-1, -2}, {-2, -1}, {-2, 1}, {-1, 2},
+			{1, 0}, {-1, 0}, {0, 1}, {0, -1},
+			{1, 1}, {1, -1}, {-1, 1}, {-1, -1},
 		}
-
 		for _, delta := range moveDeltas {
 			nextFile := file + delta[0]
 			nextRank := rank + delta[1]
@@ -20,36 +18,33 @@ func init() {
 				attacksMask = attacksMask.Set(fileRankToIndex(nextFile, nextRank))
 			}
 		}
-
-		KnightAttacks[index] = attacksMask
+		KingAttacks[index] = attacksMask
 	}
 }
 
-func GetKnightAttacks(index uint64) Bitboard {
+func GetKingAttacks(index uint64) Bitboard {
 	if index >= 64 {
 		return EmptyBitboard()
 	}
-	return KnightAttacks[index]
+	return KingAttacks[index]
 }
 
-func GetKnightAttacksFromFileRank(file, rank int) Bitboard {
+func GetKingAttacksFromFileRank(file, rank int) Bitboard {
 	if file < 0 || file >= 8 || rank < 0 || rank >= 8 {
 		return EmptyBitboard()
 	}
-	return GetKnightAttacks(fileRankToIndex(file, rank))
+	return GetKingAttacks(fileRankToIndex(file, rank))
 }
 
-func GetKnightAttacksFromSquare(square string) Bitboard {
+func GetKingAttacksFromSquare(square string) Bitboard {
 	file, rank, ok := squareToFileRank(square)
 	if !ok {
 		return EmptyBitboard()
 	}
-	return GetKnightAttacksFromFileRank(file, rank)
+	return GetKingAttacksFromFileRank(file, rank)
 }
 
-// GetValidKnightMoves returns all squares a given knight piece can legally move to,
-// excluding squares occupied by own pieces. Enemy-occupied squares are included.
-func GetValidKnightMoves(pos *Position, piece *Piece) Bitboard {
+func GetValidKingMoves(pos *Position, piece *Piece) Bitboard {
 	if piece == nil || piece.Location.IsEmpty() {
 		return EmptyBitboard()
 	}
@@ -64,6 +59,5 @@ func GetValidKnightMoves(pos *Position, piece *Piece) Bitboard {
 	} else {
 		selfOccupancy = pos.GetBlackOccupancy()
 	}
-
-	return KnightAttacks[index].And(selfOccupancy.Not())
+	return KingAttacks[index].And(selfOccupancy.Not())
 }
