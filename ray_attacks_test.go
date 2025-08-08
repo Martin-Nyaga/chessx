@@ -140,7 +140,7 @@ func TestGetValidMoves(t *testing.T) {
 
 		bishop := pos.GetPieceAtSquare("a1")
 		moves := GetValidRayMoves(pos, bishop)
-		squares := moves.NE.Or(moves.NW).Or(moves.SE).Or(moves.SW).ToSquares()
+        squares := moves.Diagonal().ToSquares()
 
 		expected := []string{"b2"}
 		for _, sq := range expected {
@@ -168,7 +168,7 @@ func TestGetValidMoves(t *testing.T) {
 
 		rook := pos.GetPieceAtSquare("a1")
 		moves := GetValidRayMoves(pos, rook)
-		squares := moves.N.Or(moves.E).Or(moves.S).Or(moves.W).ToSquares()
+        squares := moves.Orthogonal().ToSquares()
 
 		expected := []string{"b1"}
 		for _, sq := range expected {

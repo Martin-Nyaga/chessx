@@ -128,6 +128,18 @@ func (moves RayMoves) Union() Bitboard {
 	return moves.N.Or(moves.E).Or(moves.S).Or(moves.W).Or(moves.NE).Or(moves.NW).Or(moves.SE).Or(moves.SW)
 }
 
+func (moves RayMoves) Orthogonal() Bitboard {
+	return moves.N.Or(moves.E).Or(moves.S).Or(moves.W)
+}
+
+func (moves RayMoves) Diagonal() Bitboard {
+	return moves.NE.Or(moves.NW).Or(moves.SE).Or(moves.SW)
+}
+
+func (moves RayMoves) All() Bitboard {
+	return moves.Union()
+}
+
 func GetRayAttacks(index uint64) Bitboard {
 	if index >= 64 {
 		return EmptyBitboard()

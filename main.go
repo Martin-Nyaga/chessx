@@ -50,7 +50,7 @@ func main() {
 
 	rook := testPos.GetPieceAtSquare("a1")
 	moves := GetValidRayMoves(testPos, rook)
-	orthogonal := moves.N.Or(moves.E).Or(moves.S).Or(moves.W)
+    orthogonal := moves.Orthogonal()
 	fmt.Printf("Valid moves for Rook at a1: %s\n", strings.Join(orthogonal.ToSquares(), " "))
 	fmt.Printf("  Bitboard:\n%s", orthogonal.String())
 	fmt.Println()
@@ -83,7 +83,7 @@ func main() {
 
 	bishop := testPos2.GetPieceAtSquare("a1")
 	moves2 := GetValidRayMoves(testPos2, bishop)
-	diagonal := moves2.NE.Or(moves2.NW).Or(moves2.SE).Or(moves2.SW)
+    diagonal := moves2.Diagonal()
 	fmt.Printf("Valid moves for Bishop at a1: %s\n", strings.Join(diagonal.ToSquares(), " "))
 	fmt.Printf("  Bitboard:\n%s", diagonal.String())
 }
