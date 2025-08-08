@@ -63,15 +63,7 @@ func NewPosition() *Position {
 	return pos
 }
 
-func fileRankToIndex(file, rank int) uint64 {
-	return uint64(rank*8 + file)
-}
-
-func indexToFileRank(index uint64) (int, int) {
-	file := int(index % 8)
-	rank := int(index / 8)
-	return file, rank
-}
+// moved to board_utils.go: fileRankToIndex, indexToFileRank
 
 func (p *Position) SetPiece(file, rank int, kind PieceKind, color Color) {
 	if file < 0 || file >= 8 || rank < 0 || rank >= 8 {

@@ -67,11 +67,11 @@ func init() {
 // firstHitPiece finds the nearest occupied board index along a ray.
 //
 // Parameters:
-// - ray: bitboard of all reachable indexes along a single direction from the origin index
-// - selfOccupancy: bitboard of own pieces
-// - enemyOccupancy: bitboard of opponent pieces
-// - increasing: when true, choose the lowest set bit on the ray (towards increasing file/rank);
-//               when false, choose the highest set bit (towards decreasing file/rank)
+//   - ray: bitboard of all reachable indexes along a single direction from the origin index
+//   - selfOccupancy: bitboard of own pieces
+//   - enemyOccupancy: bitboard of opponent pieces
+//   - increasing: when true, choose the lowest set bit on the ray (towards increasing file/rank);
+//     when false, choose the highest set bit (towards decreasing file/rank)
 //
 // Returns:
 // - nearestIndex: 0..63 board index of the nearest blocking piece on the ray
