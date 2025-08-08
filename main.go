@@ -25,7 +25,12 @@ func main() {
 
 	exampleSquares := []string{"a1", "e4", "h8"}
 	for _, square := range exampleSquares {
-		attacks := GetOrthogonalAttacksFromSquare(square)
+		attacks := GetRayAttacksFromSquare(square).And(FromSquare("a1").Not()) // placeholder mask removal unused; will filter below
+		// Filter to orthogonal rays only
+		file := int(square[0] - 'a')
+		rank := int(square[1] - '1')
+		index := fileRankToIndex(file, rank)
+		attacks = Rays.N[index].Or(Rays.E[index]).Or(Rays.S[index]).Or(Rays.W[index])
 		fmt.Printf("Rook at %s can attack:\n", square)
 		fmt.Printf("  Squares: %s\n", strings.Join(attacks.ToSquares(), " "))
 		fmt.Printf("  Bitboard:\n%s", attacks.String())
@@ -44,9 +49,10 @@ func main() {
 	fmt.Println(testPos.String())
 
 	rook := testPos.GetPieceAtSquare("a1")
-	moves := GetValidOrthogonalMoves(testPos, rook)
-	fmt.Printf("Valid moves for Rook at a1: %s\n", strings.Join(moves.ToSquares(), " "))
-	fmt.Printf("  Bitboard:\n%s", moves.String())
+	moves := GetValidRayMoves(testPos, rook)
+	orthogonal := moves.N.Or(moves.E).Or(moves.S).Or(moves.W)
+	fmt.Printf("Valid moves for Rook at a1: %s\n", strings.Join(orthogonal.ToSquares(), " "))
+	fmt.Printf("  Bitboard:\n%s", orthogonal.String())
 	fmt.Println()
 
 	fmt.Println("Diagonal Attack Patterns (Bishop moves):")
@@ -54,7 +60,10 @@ func main() {
 
 	exampleSquares = []string{"a1", "e4", "h8"}
 	for _, square := range exampleSquares {
-		attacks := GetDiagonalAttacksFromSquare(square)
+		file := int(square[0] - 'a')
+		rank := int(square[1] - '1')
+		index := fileRankToIndex(file, rank)
+		attacks := Rays.NE[index].Or(Rays.NW[index]).Or(Rays.SE[index]).Or(Rays.SW[index])
 		fmt.Printf("Bishop at %s can attack:\n", square)
 		fmt.Printf("  Squares: %s\n", strings.Join(attacks.ToSquares(), " "))
 		fmt.Printf("  Bitboard:\n%s", attacks.String())
@@ -73,7 +82,8 @@ func main() {
 	fmt.Println(testPos2.String())
 
 	bishop := testPos2.GetPieceAtSquare("a1")
-	moves2 := GetValidDiagonalMoves(testPos2, bishop)
-	fmt.Printf("Valid moves for Bishop at a1: %s\n", strings.Join(moves2.ToSquares(), " "))
-	fmt.Printf("  Bitboard:\n%s", moves2.String())
+	moves2 := GetValidRayMoves(testPos2, bishop)
+	diagonal := moves2.NE.Or(moves2.NW).Or(moves2.SE).Or(moves2.SW)
+	fmt.Printf("Valid moves for Bishop at a1: %s\n", strings.Join(diagonal.ToSquares(), " "))
+	fmt.Printf("  Bitboard:\n%s", diagonal.String())
 }

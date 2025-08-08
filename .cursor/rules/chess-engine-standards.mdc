@@ -55,3 +55,13 @@ alwaysApply: true
 - Focus on the main change, not implementation details
 - Always use a footer "Authored by Cursor" when committing
 - Always use --no-gpg-sign flag when committing
+
+## Naming Conventions (Rays, Moves, Squares)
+- Prefer full words over abbreviations in variable and function names
+- Use shorter full words instead of cryptic abbreviations (e.g., `computeDirection`, not `computeDir`)
+- Acceptable loop counters: `i`, `j`
+- Use the following terminology consistently:
+  - `square`: algebraic notation string like "a1"
+  - `index`: 0..63 board index (bit index / array index)
+  - `file`, `rank`: 0..7 coordinates on the board
+  - `selfOccupancy`, `enemyOccupancy`: bitboards for side-to-move or piece color as appropriate
