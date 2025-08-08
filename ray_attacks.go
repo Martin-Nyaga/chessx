@@ -168,12 +168,8 @@ func GetRayAttacksFromFileRank(file, rank int) Bitboard {
 }
 
 func GetRayAttacksFromSquare(square string) Bitboard {
-	if len(square) != 2 {
-		return EmptyBitboard()
-	}
-	file := int(square[0] - 'a')
-	rank := int(square[1] - '1')
-	if file < 0 || file >= 8 || rank < 0 || rank >= 8 {
+	file, rank, ok := squareToFileRank(square)
+	if !ok {
 		return EmptyBitboard()
 	}
 	return GetRayAttacksFromFileRank(file, rank)

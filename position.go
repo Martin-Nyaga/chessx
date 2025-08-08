@@ -174,20 +174,18 @@ func (p *Position) GetAllOccupancy() Bitboard {
 }
 
 func (p *Position) GetPieceAtSquare(square string) *Piece {
-	if len(square) != 2 {
+	file, rank, ok := squareToFileRank(square)
+	if !ok {
 		return nil
 	}
-	file := int(square[0] - 'a')
-	rank := int(square[1] - '1')
 	return p.GetPiece(file, rank)
 }
 
 func (p *Position) SetPieceAtSquare(square string, kind PieceKind, color Color) {
-	if len(square) != 2 {
+	file, rank, ok := squareToFileRank(square)
+	if !ok {
 		return
 	}
-	file := int(square[0] - 'a')
-	rank := int(square[1] - '1')
 	p.SetPiece(file, rank, kind, color)
 }
 
@@ -333,12 +331,8 @@ func ParseFEN(fen string) (*Position, error) {
 	if len(parts) > 3 {
 		enpassant := parts[3]
 		if enpassant != "-" {
-			if len(enpassant) == 2 {
-				file := int(enpassant[0] - 'a')
-				rank := int(enpassant[1] - '1')
-				if file >= 0 && file < 8 && rank >= 0 && rank < 8 {
-					pos.SetEnpassant(fileRankToIndex(file, rank))
-				}
+			if file, rank, ok := squareToFileRank(enpassant); ok {
+				pos.SetEnpassant(fileRankToIndex(file, rank))
 			}
 		}
 	}

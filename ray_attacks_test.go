@@ -15,11 +15,10 @@ func TestRayAttacks_Basic(t *testing.T) {
 		}
 		for _, test := range tests {
 			t.Run(test.square, func(t *testing.T) {
-				if len(test.square) != 2 {
+				file, rank, ok := squareToFileRank(test.square)
+				if !ok {
 					t.Fatalf("bad test square")
 				}
-				file := int(test.square[0] - 'a')
-				rank := int(test.square[1] - '1')
 				index := fileRankToIndex(file, rank)
 				attacks := Rays.NE[index].Or(Rays.NW[index]).Or(Rays.SE[index]).Or(Rays.SW[index])
 				squares := attacks.ToSquares()
@@ -54,11 +53,10 @@ func TestRayAttacks_Basic(t *testing.T) {
 		}
 		for _, test := range tests {
 			t.Run(test.square, func(t *testing.T) {
-				if len(test.square) != 2 {
+				file, rank, ok := squareToFileRank(test.square)
+				if !ok {
 					t.Fatalf("bad test square")
 				}
-				file := int(test.square[0] - 'a')
-				rank := int(test.square[1] - '1')
 				index := fileRankToIndex(file, rank)
 				attacks := Rays.N[index].Or(Rays.E[index]).Or(Rays.S[index]).Or(Rays.W[index])
 				squares := attacks.ToSquares()
@@ -140,7 +138,7 @@ func TestGetValidMoves(t *testing.T) {
 
 		bishop := pos.GetPieceAtSquare("a1")
 		moves := GetValidRayMoves(pos, bishop)
-        squares := moves.Diagonal().ToSquares()
+		squares := moves.Diagonal().ToSquares()
 
 		expected := []string{"b2"}
 		for _, sq := range expected {
@@ -168,7 +166,7 @@ func TestGetValidMoves(t *testing.T) {
 
 		rook := pos.GetPieceAtSquare("a1")
 		moves := GetValidRayMoves(pos, rook)
-        squares := moves.Orthogonal().ToSquares()
+		squares := moves.Orthogonal().ToSquares()
 
 		expected := []string{"b1"}
 		for _, sq := range expected {
