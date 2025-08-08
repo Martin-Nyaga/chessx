@@ -1,3 +1,9 @@
+---
+description: Chess Engine Coding Standards and Guidelines
+globs: ["**/*.go"]
+alwaysApply: true
+---
+
 # Chess Engine Coding Standards
 
 ## Code Style
