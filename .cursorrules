@@ -47,3 +47,5 @@
 - Keep commit messages short, ideally one line unless absolutely necessary
 - Use clear, descriptive commit messages that explain what was changed
 - Focus on the main change, not implementation details
+- Always use a footer "Authored by Cursor" when committing
+- Always use --no-gpg-sign flag when committing
