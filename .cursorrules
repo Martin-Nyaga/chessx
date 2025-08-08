@@ -1,0 +1,39 @@
+# Chess Engine Coding Standards
+
+## Code Style
+- Use clear, descriptive function and variable names
+- Avoid unnecessary comments - only add them for complex algorithms or non-obvious logic
+- Use existing utilities when available (e.g., bitboard.String() for printing)
+- Keep functions focused and single-purpose
+- Use proper error handling and validation
+
+## Testing
+- Write tests for new functionality
+- Include edge cases and invalid inputs
+- Use descriptive test names and structure
+- Test both happy path and error conditions
+
+## Chess-Specific Guidelines
+- Use standard chess notation (a1-h8 for squares)
+- Implement compile-time generation for lookup tables when possible
+- Use bitboards for efficient move generation and evaluation
+- Follow chess engine conventions for piece movement and attack patterns
+
+## File Organization
+- Group related functionality in appropriate files
+- Use consistent naming conventions
+- Keep main.go focused on demonstration/entry point
+- Separate concerns (position, moves, evaluation, etc.)
+
+## Performance
+- Prefer compile-time generation over runtime calculation for lookup tables
+- Use efficient bitboard operations
+- Minimize allocations in hot paths
+- Profile performance-critical sections
+
+## Documentation
+- Document public APIs clearly
+- Include examples for complex functions
+- Keep README updated with project status
+- Use clear commit messages
+- Don't summarize changes after completing a task!
