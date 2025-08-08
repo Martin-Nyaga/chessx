@@ -64,7 +64,19 @@ func init() {
 	}
 }
 
-// firstHitPiece returns the nearest occupied index on the ray and whether it is an enemy.
+// firstHitPiece finds the nearest occupied board index along a ray.
+//
+// Parameters:
+// - ray: bitboard of all reachable indexes along a single direction from the origin index
+// - selfOccupancy: bitboard of own pieces
+// - enemyOccupancy: bitboard of opponent pieces
+// - increasing: when true, choose the lowest set bit on the ray (towards increasing file/rank);
+//               when false, choose the highest set bit (towards decreasing file/rank)
+//
+// Returns:
+// - nearestIndex: 0..63 board index of the nearest blocking piece on the ray
+// - nearestIsEnemy: true if the blocking piece is an enemy piece, false if it is own piece
+// - found: false when no piece lies on the ray; in that case nearestIndex/nearestIsEnemy are undefined
 func firstHitPiece(ray Bitboard, selfOccupancy, enemyOccupancy Bitboard, increasing bool) (uint64, bool, bool) {
 	selfOccupancyMask := ray.And(selfOccupancy)
 	enemyOccupancyMask := ray.And(enemyOccupancy)
