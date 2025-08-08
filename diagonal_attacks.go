@@ -102,13 +102,14 @@ func GetDiagonalAttacksFromSquare(square string) Bitboard {
 	return GetDiagonalAttacksFromFileRank(file, rank)
 }
 
-func GetValidDiagonalMoves(pos *Position, file, rank int) Bitboard {
-	if file < 0 || file >= 8 || rank < 0 || rank >= 8 {
+func GetValidDiagonalMoves(pos *Position, piece *Piece) Bitboard {
+	if piece == nil || (piece.Kind != Bishop && piece.Kind != Queen) {
 		return EmptyBitboard()
 	}
 
-	piece := pos.GetPiece(file, rank)
-	if piece == nil || (piece.Kind != Bishop && piece.Kind != Queen) {
+	// Extract file and rank from piece
+	file, rank := piece.FileRank()
+	if file < 0 || rank < 0 {
 		return EmptyBitboard()
 	}
 

@@ -82,7 +82,8 @@ func TestGetValidOrthogonalMoves(t *testing.T) {
 	pos.SetPiece(1, 0, Pawn, Black)
 	pos.SetPiece(0, 1, Pawn, White)
 
-	moves := GetValidOrthogonalMoves(pos, 0, 0)
+	rook := pos.GetPiece(0, 0)
+	moves := GetValidOrthogonalMoves(pos, rook)
 	squares := moves.ToSquares()
 
 	expected := []string{"b1"}

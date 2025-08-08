@@ -43,7 +43,8 @@ func main() {
 	fmt.Println("Position with White Rook at a1, Black Pawn at b1, White Pawn at a2:")
 	fmt.Println(testPos.String())
 
-	moves := GetValidOrthogonalMoves(testPos, 0, 0)
+	rook := testPos.GetPiece(0, 0)
+	moves := GetValidOrthogonalMoves(testPos, rook)
 	fmt.Printf("Valid moves for Rook at a1: %s\n", strings.Join(moves.ToSquares(), " "))
 	fmt.Printf("  Bitboard:\n%s", moves.String())
 	fmt.Println()
@@ -71,7 +72,8 @@ func main() {
 	fmt.Println("Position with White Bishop at a1, Black Pawn at b2, White Pawn at c3:")
 	fmt.Println(testPos2.String())
 
-	moves2 := GetValidDiagonalMoves(testPos2, 0, 0)
+	bishop := testPos2.GetPiece(0, 0)
+	moves2 := GetValidDiagonalMoves(testPos2, bishop)
 	fmt.Printf("Valid moves for Bishop at a1: %s\n", strings.Join(moves2.ToSquares(), " "))
 	fmt.Printf("  Bitboard:\n%s", moves2.String())
 }

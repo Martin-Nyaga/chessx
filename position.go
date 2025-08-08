@@ -31,12 +31,6 @@ const (
 	King
 )
 
-type Piece struct {
-	Kind     PieceKind
-	Color    Color
-	Location Bitboard
-}
-
 type Position struct {
 	pieces     []Piece
 	board      [64]int

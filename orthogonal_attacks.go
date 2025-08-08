@@ -82,13 +82,14 @@ func GetOrthogonalAttacksFromSquare(square string) Bitboard {
 	return GetOrthogonalAttacksFromFileRank(file, rank)
 }
 
-func GetValidOrthogonalMoves(pos *Position, file, rank int) Bitboard {
-	if file < 0 || file >= 8 || rank < 0 || rank >= 8 {
+func GetValidOrthogonalMoves(pos *Position, piece *Piece) Bitboard {
+	if piece == nil || (piece.Kind != Rook && piece.Kind != Queen) {
 		return EmptyBitboard()
 	}
 
-	piece := pos.GetPiece(file, rank)
-	if piece == nil || (piece.Kind != Rook && piece.Kind != Queen) {
+	// Extract file and rank from piece
+	file, rank := piece.FileRank()
+	if file < 0 || rank < 0 {
 		return EmptyBitboard()
 	}
 

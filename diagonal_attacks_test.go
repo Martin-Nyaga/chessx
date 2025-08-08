@@ -101,7 +101,8 @@ func TestGetValidDiagonalMoves(t *testing.T) {
 	pos.SetPiece(1, 1, Pawn, Black)
 	pos.SetPiece(2, 2, Pawn, White)
 
-	moves := GetValidDiagonalMoves(pos, 0, 0)
+	bishop := pos.GetPiece(0, 0)
+	moves := GetValidDiagonalMoves(pos, bishop)
 	squares := moves.ToSquares()
 
 	expected := []string{"b2"}
