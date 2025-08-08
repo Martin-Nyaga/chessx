@@ -107,42 +107,62 @@ func GetValidDiagonalMoves(pos *Position, piece *Piece) Bitboard {
 		return EmptyBitboard()
 	}
 
-	// Extract file and rank from piece
+	// Get the piece's square index
+	if piece.Location.IsEmpty() {
+		return EmptyBitboard()
+	}
+	square := piece.Location.FirstSet()
+	if square >= 64 {
+		return EmptyBitboard()
+	}
+
+	// Start with all potential diagonal attacks from this square
+	potentialMoves := DiagonalAttacks[square]
+	validMoves := EmptyBitboard()
+
+	// Get file and rank for blocking detection
 	file, rank := piece.FileRank()
 	if file < 0 || rank < 0 {
 		return EmptyBitboard()
 	}
 
-	validMoves := EmptyBitboard()
-
+	// Check each diagonal direction for blocking pieces
 	// Positive diagonal (top-left to bottom-right)
 	for i := 1; i < 8; i++ {
 		f, r := file+i, rank+i
 		if f >= 8 || r >= 8 {
 			break
 		}
+		squareIndex := fileRankToIndex(f, r)
+		if !potentialMoves.IsSet(squareIndex) {
+			break
+		}
 		target := pos.GetPiece(f, r)
 		if target != nil {
 			if target.Color != piece.Color {
-				validMoves = validMoves.Set(fileRankToIndex(f, r))
+				validMoves = validMoves.Set(squareIndex)
 			}
 			break
 		}
-		validMoves = validMoves.Set(fileRankToIndex(f, r))
+		validMoves = validMoves.Set(squareIndex)
 	}
 	for i := 1; i < 8; i++ {
 		f, r := file-i, rank-i
 		if f < 0 || r < 0 {
 			break
 		}
+		squareIndex := fileRankToIndex(f, r)
+		if !potentialMoves.IsSet(squareIndex) {
+			break
+		}
 		target := pos.GetPiece(f, r)
 		if target != nil {
 			if target.Color != piece.Color {
-				validMoves = validMoves.Set(fileRankToIndex(f, r))
+				validMoves = validMoves.Set(squareIndex)
 			}
 			break
 		}
-		validMoves = validMoves.Set(fileRankToIndex(f, r))
+		validMoves = validMoves.Set(squareIndex)
 	}
 
 	// Negative diagonal (top-right to bottom-left)
@@ -151,28 +171,36 @@ func GetValidDiagonalMoves(pos *Position, piece *Piece) Bitboard {
 		if f >= 8 || r < 0 {
 			break
 		}
+		squareIndex := fileRankToIndex(f, r)
+		if !potentialMoves.IsSet(squareIndex) {
+			break
+		}
 		target := pos.GetPiece(f, r)
 		if target != nil {
 			if target.Color != piece.Color {
-				validMoves = validMoves.Set(fileRankToIndex(f, r))
+				validMoves = validMoves.Set(squareIndex)
 			}
 			break
 		}
-		validMoves = validMoves.Set(fileRankToIndex(f, r))
+		validMoves = validMoves.Set(squareIndex)
 	}
 	for i := 1; i < 8; i++ {
 		f, r := file-i, rank+i
 		if f < 0 || r >= 8 {
 			break
 		}
+		squareIndex := fileRankToIndex(f, r)
+		if !potentialMoves.IsSet(squareIndex) {
+			break
+		}
 		target := pos.GetPiece(f, r)
 		if target != nil {
 			if target.Color != piece.Color {
-				validMoves = validMoves.Set(fileRankToIndex(f, r))
+				validMoves = validMoves.Set(squareIndex)
 			}
 			break
 		}
-		validMoves = validMoves.Set(fileRankToIndex(f, r))
+		validMoves = validMoves.Set(squareIndex)
 	}
 
 	return validMoves

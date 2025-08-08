@@ -87,56 +87,88 @@ func GetValidOrthogonalMoves(pos *Position, piece *Piece) Bitboard {
 		return EmptyBitboard()
 	}
 
-	// Extract file and rank from piece
+	// Get the piece's square index
+	if piece.Location.IsEmpty() {
+		return EmptyBitboard()
+	}
+	square := piece.Location.FirstSet()
+	if square >= 64 {
+		return EmptyBitboard()
+	}
+
+	// Start with all potential orthogonal attacks from this square
+	potentialMoves := OrthogonalAttacks[square]
+	validMoves := EmptyBitboard()
+
+	// Get file and rank for blocking detection
 	file, rank := piece.FileRank()
 	if file < 0 || rank < 0 {
 		return EmptyBitboard()
 	}
 
-	validMoves := EmptyBitboard()
-
+	// Check each direction for blocking pieces
+	// Left direction
 	for f := file - 1; f >= 0; f-- {
+		squareIndex := fileRankToIndex(f, rank)
+		if !potentialMoves.IsSet(squareIndex) {
+			break
+		}
 		target := pos.GetPiece(f, rank)
 		if target != nil {
 			if target.Color != piece.Color {
-				validMoves = validMoves.Set(fileRankToIndex(f, rank))
+				validMoves = validMoves.Set(squareIndex)
 			}
 			break
 		}
-		validMoves = validMoves.Set(fileRankToIndex(f, rank))
+		validMoves = validMoves.Set(squareIndex)
 	}
 
+	// Right direction
 	for f := file + 1; f < 8; f++ {
+		squareIndex := fileRankToIndex(f, rank)
+		if !potentialMoves.IsSet(squareIndex) {
+			break
+		}
 		target := pos.GetPiece(f, rank)
 		if target != nil {
 			if target.Color != piece.Color {
-				validMoves = validMoves.Set(fileRankToIndex(f, rank))
+				validMoves = validMoves.Set(squareIndex)
 			}
 			break
 		}
-		validMoves = validMoves.Set(fileRankToIndex(f, rank))
+		validMoves = validMoves.Set(squareIndex)
 	}
 
+	// Down direction
 	for r := rank - 1; r >= 0; r-- {
+		squareIndex := fileRankToIndex(file, r)
+		if !potentialMoves.IsSet(squareIndex) {
+			break
+		}
 		target := pos.GetPiece(file, r)
 		if target != nil {
 			if target.Color != piece.Color {
-				validMoves = validMoves.Set(fileRankToIndex(file, r))
+				validMoves = validMoves.Set(squareIndex)
 			}
 			break
 		}
-		validMoves = validMoves.Set(fileRankToIndex(file, r))
+		validMoves = validMoves.Set(squareIndex)
 	}
 
+	// Up direction
 	for r := rank + 1; r < 8; r++ {
+		squareIndex := fileRankToIndex(file, r)
+		if !potentialMoves.IsSet(squareIndex) {
+			break
+		}
 		target := pos.GetPiece(file, r)
 		if target != nil {
 			if target.Color != piece.Color {
-				validMoves = validMoves.Set(fileRankToIndex(file, r))
+				validMoves = validMoves.Set(squareIndex)
 			}
 			break
 		}
-		validMoves = validMoves.Set(fileRankToIndex(file, r))
+		validMoves = validMoves.Set(squareIndex)
 	}
 
 	return validMoves

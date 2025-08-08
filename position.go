@@ -32,24 +32,28 @@ const (
 )
 
 type Position struct {
-	pieces     []Piece
-	board      [64]int
-	toMove     Color
-	moveNumber int
-	castling   byte
-	enpassant  Bitboard
-	halfmoves  int
+	pieces         []Piece
+	board          [64]int
+	toMove         Color
+	moveNumber     int
+	castling       byte
+	enpassant      Bitboard
+	halfmoves      int
+	whiteOccupancy Bitboard
+	blackOccupancy Bitboard
 }
 
 func NewPosition() *Position {
 	pos := &Position{
-		pieces:     make([]Piece, 0),
-		board:      [64]int{},
-		toMove:     White,
-		moveNumber: 1,
-		castling:   0,
-		enpassant:  EmptyBitboard(),
-		halfmoves:  0,
+		pieces:         make([]Piece, 0),
+		board:          [64]int{},
+		toMove:         White,
+		moveNumber:     1,
+		castling:       0,
+		enpassant:      EmptyBitboard(),
+		halfmoves:      0,
+		whiteOccupancy: EmptyBitboard(),
+		blackOccupancy: EmptyBitboard(),
 	}
 
 	for i := 0; i < 64; i++ {
@@ -76,9 +80,16 @@ func (p *Position) SetPiece(file, rank int, kind PieceKind, color Color) {
 
 	index := fileRankToIndex(file, rank)
 
+	// Remove existing piece from occupancy bitboards
 	if p.board[index] != -1 {
 		pieceIndex := p.board[index]
 		if pieceIndex < len(p.pieces) {
+			existingPiece := p.pieces[pieceIndex]
+			if existingPiece.Color == White {
+				p.whiteOccupancy = p.whiteOccupancy.Clear(index)
+			} else {
+				p.blackOccupancy = p.blackOccupancy.Clear(index)
+			}
 			p.pieces = append(p.pieces[:pieceIndex], p.pieces[pieceIndex+1:]...)
 			for i := range p.board {
 				if p.board[i] > pieceIndex {
@@ -89,6 +100,7 @@ func (p *Position) SetPiece(file, rank int, kind PieceKind, color Color) {
 		p.board[index] = -1
 	}
 
+	// Add new piece to occupancy bitboards (only if not Empty)
 	if kind != Empty {
 		piece := Piece{
 			Kind:     kind,
@@ -97,6 +109,12 @@ func (p *Position) SetPiece(file, rank int, kind PieceKind, color Color) {
 		}
 		p.pieces = append(p.pieces, piece)
 		p.board[index] = len(p.pieces) - 1
+
+		if color == White {
+			p.whiteOccupancy = p.whiteOccupancy.Set(index)
+		} else {
+			p.blackOccupancy = p.blackOccupancy.Set(index)
+		}
 	}
 }
 
@@ -149,6 +167,18 @@ func (p *Position) SetHalfmoves(halfmoves int) {
 
 func (p *Position) GetHalfmoves() int {
 	return p.halfmoves
+}
+
+func (p *Position) GetWhiteOccupancy() Bitboard {
+	return p.whiteOccupancy
+}
+
+func (p *Position) GetBlackOccupancy() Bitboard {
+	return p.blackOccupancy
+}
+
+func (p *Position) GetAllOccupancy() Bitboard {
+	return p.whiteOccupancy.Or(p.blackOccupancy)
 }
 
 func (p *Position) String() string {

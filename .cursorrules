@@ -36,4 +36,9 @@
 - Include examples for complex functions
 - Keep README updated with project status
 - Use clear commit messages
-- Don't summarize changes after completing a task!
+
+## Response Guidelines
+- NEVER include summaries, recaps, or "Summary" sections in responses
+- Provide direct, actionable responses without summarizing what was done
+- Focus on the current task and next steps only
+- Avoid phrases like "In summary", "To recap", "In conclusion", etc.
