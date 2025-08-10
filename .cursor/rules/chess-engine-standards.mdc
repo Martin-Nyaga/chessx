@@ -50,6 +50,7 @@ alwaysApply: true
 - Avoid phrases like "In summary", "To recap", "In conclusion", etc.
 
 ## Commit Guidelines
+- Do not commit until the explicitly user asks you to.
 - Keep commit messages short, ideally one line unless absolutely necessary
 - Use clear, descriptive commit messages that explain what was changed
 - Focus on the main change, not implementation details

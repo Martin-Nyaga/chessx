@@ -1,5 +1,6 @@
 package main
 
+// KingMoves stores precomputed move bitboards for a king from each square.
 var KingMoves [64]Bitboard
 
 func init() {
@@ -44,6 +45,8 @@ func GetKingMovesFromSquare(square string) Bitboard {
 	return GetKingMovesFromFileRank(file, rank)
 }
 
+// GetPossibleKingMoves returns pseudo-legal moves for a king,
+// excluding squares occupied by own pieces (castling not included here).
 func GetPossibleKingMoves(pos *Position, piece *Piece) Bitboard {
 	if piece == nil || piece.Location.IsEmpty() {
 		return EmptyBitboard()

@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// AllRayMoves stores per-square rays in all 8 directions used to compute sliding piece moves.
 type AllRayMoves struct {
 	N  [64]Bitboard
 	E  [64]Bitboard
@@ -189,10 +190,9 @@ func PrintRayMoves() {
 	}
 }
 
-// GetValidRayMoves returns valid ray moves for a piece in each direction (N,E,S,W,NE,NW,SE,SW),
-// useful for generating queen, rook, and bishop moves.
-// Rays are truncated at the first blocker piece encountered. If the blocker is an enemy piece,
-// that square is included in the valid moves. If it's a friendly piece, that square is excluded.
+// GetPossibleRayMoves returns pseudo-legal sliding moves in each direction (N,E,S,W,NE,NW,SE,SW)
+// for bishops, rooks, and queens. Rays are truncated at the first blocker piece encountered.
+// If the blocker is an enemy piece, that square is included; if it's a friendly piece, it is excluded.
 func GetPossibleRayMoves(pos *Position, piece *Piece) RayMoves {
 	if piece == nil || piece.Location.IsEmpty() {
 		return RayMoves{}

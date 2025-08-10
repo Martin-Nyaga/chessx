@@ -1,6 +1,6 @@
 package main
 
-// KnightMoves stores precomputed move bitboards for a knight from each square
+// KnightMoves stores precomputed move bitboards for a knight from each square.
 var KnightMoves [64]Bitboard
 
 func init() {
@@ -47,8 +47,8 @@ func GetKnightMovesFromSquare(square string) Bitboard {
 	return GetKnightMovesFromFileRank(file, rank)
 }
 
-// GetValidKnightMoves returns all squares a given knight piece can legally move to,
-// excluding squares occupied by own pieces. Enemy-occupied squares are included.
+// GetPossibleKnightMoves returns pseudo-legal moves for a knight,
+// excluding squares occupied by own pieces (enemy-occupied squares are included).
 func GetPossibleKnightMoves(pos *Position, piece *Piece) Bitboard {
 	if piece == nil || piece.Location.IsEmpty() {
 		return EmptyBitboard()
