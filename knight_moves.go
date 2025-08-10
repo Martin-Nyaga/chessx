@@ -1,7 +1,7 @@
 package main
 
-// KnightAttacks stores precomputed attack bitboards for a knight from each square
-var KnightAttacks [64]Bitboard
+// KnightMoves stores precomputed move bitboards for a knight from each square
+var KnightMoves [64]Bitboard
 
 func init() {
 	for index := uint64(0); index < 64; index++ {
@@ -21,30 +21,30 @@ func init() {
 			}
 		}
 
-		KnightAttacks[index] = attacksMask
+		KnightMoves[index] = attacksMask
 	}
 }
 
-func GetKnightAttacks(index uint64) Bitboard {
+func GetKnightMoves(index uint64) Bitboard {
 	if index >= 64 {
 		return EmptyBitboard()
 	}
-	return KnightAttacks[index]
+	return KnightMoves[index]
 }
 
-func GetKnightAttacksFromFileRank(file, rank int) Bitboard {
+func GetKnightMovesFromFileRank(file, rank int) Bitboard {
 	if file < 0 || file >= 8 || rank < 0 || rank >= 8 {
 		return EmptyBitboard()
 	}
-	return GetKnightAttacks(fileRankToIndex(file, rank))
+	return GetKnightMoves(fileRankToIndex(file, rank))
 }
 
-func GetKnightAttacksFromSquare(square string) Bitboard {
+func GetKnightMovesFromSquare(square string) Bitboard {
 	file, rank, ok := squareToFileRank(square)
 	if !ok {
 		return EmptyBitboard()
 	}
-	return GetKnightAttacksFromFileRank(file, rank)
+	return GetKnightMovesFromFileRank(file, rank)
 }
 
 // GetValidKnightMoves returns all squares a given knight piece can legally move to,
@@ -65,5 +65,5 @@ func GetValidKnightMoves(pos *Position, piece *Piece) Bitboard {
 		selfOccupancy = pos.GetBlackOccupancy()
 	}
 
-	return KnightAttacks[index].And(selfOccupancy.Not())
+	return KnightMoves[index].And(selfOccupancy.Not())
 }

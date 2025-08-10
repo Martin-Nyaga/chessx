@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestKnightAttacks_Basic(t *testing.T) {
+func TestKnightMoves_Basic(t *testing.T) {
 	tests := []struct {
 		square   string
 		expected []string
@@ -19,8 +19,8 @@ func TestKnightAttacks_Basic(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.square, func(t *testing.T) {
-			attacks := GetKnightAttacksFromSquare(tt.square)
-			squares := attacks.ToSquares()
+			bb := GetKnightMovesFromSquare(tt.square)
+			squares := bb.ToSquares()
 			sort.Strings(squares)
 			sort.Strings(tt.expected)
 			if len(squares) != len(tt.expected) {
@@ -63,11 +63,11 @@ func TestGetValidKnightMoves(t *testing.T) {
 	}
 }
 
-func TestKnightAttacks_InvalidInput(t *testing.T) {
+func TestKnightMoves_InvalidInput(t *testing.T) {
 	invalid := []string{"", "a", "z9", "i1"}
 	for _, s := range invalid {
-		if !GetKnightAttacksFromSquare(s).IsEmpty() {
-			t.Errorf("Expected empty attacks for invalid square %q", s)
+		if !GetKnightMovesFromSquare(s).IsEmpty() {
+			t.Errorf("Expected empty moves for invalid square %q", s)
 		}
 	}
 }

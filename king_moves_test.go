@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestKingAttacks_Basic(t *testing.T) {
+func TestKingMoves_Basic(t *testing.T) {
 	tests := []struct {
 		square   string
 		expected []string
@@ -17,8 +17,8 @@ func TestKingAttacks_Basic(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.square, func(t *testing.T) {
-			att := GetKingAttacksFromSquare(tt.square)
-			got := att.ToSquares()
+			bb := GetKingMovesFromSquare(tt.square)
+			got := bb.ToSquares()
 			sort.Strings(got)
 			sort.Strings(tt.expected)
 			if len(got) != len(tt.expected) {

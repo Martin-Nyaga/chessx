@@ -1,6 +1,6 @@
 package main
 
-var KingAttacks [64]Bitboard
+var KingMoves [64]Bitboard
 
 func init() {
 	for index := uint64(0); index < 64; index++ {
@@ -18,30 +18,30 @@ func init() {
 				attacksMask = attacksMask.Set(fileRankToIndex(nextFile, nextRank))
 			}
 		}
-		KingAttacks[index] = attacksMask
+		KingMoves[index] = attacksMask
 	}
 }
 
-func GetKingAttacks(index uint64) Bitboard {
+func GetKingMoves(index uint64) Bitboard {
 	if index >= 64 {
 		return EmptyBitboard()
 	}
-	return KingAttacks[index]
+	return KingMoves[index]
 }
 
-func GetKingAttacksFromFileRank(file, rank int) Bitboard {
+func GetKingMovesFromFileRank(file, rank int) Bitboard {
 	if file < 0 || file >= 8 || rank < 0 || rank >= 8 {
 		return EmptyBitboard()
 	}
-	return GetKingAttacks(fileRankToIndex(file, rank))
+	return GetKingMoves(fileRankToIndex(file, rank))
 }
 
-func GetKingAttacksFromSquare(square string) Bitboard {
+func GetKingMovesFromSquare(square string) Bitboard {
 	file, rank, ok := squareToFileRank(square)
 	if !ok {
 		return EmptyBitboard()
 	}
-	return GetKingAttacksFromFileRank(file, rank)
+	return GetKingMovesFromFileRank(file, rank)
 }
 
 func GetValidKingMoves(pos *Position, piece *Piece) Bitboard {
@@ -59,5 +59,5 @@ func GetValidKingMoves(pos *Position, piece *Piece) Bitboard {
 	} else {
 		selfOccupancy = pos.GetBlackOccupancy()
 	}
-	return KingAttacks[index].And(selfOccupancy.Not())
+	return KingMoves[index].And(selfOccupancy.Not())
 }

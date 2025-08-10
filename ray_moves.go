@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type RayAttacks struct {
+type RayMovesLookup struct {
 	N  [64]Bitboard
 	E  [64]Bitboard
 	S  [64]Bitboard
@@ -16,7 +16,7 @@ type RayAttacks struct {
 	SW [64]Bitboard
 }
 
-var Rays RayAttacks
+var Rays RayMovesLookup
 
 func init() {
 	for index := uint64(0); index < 64; index++ {
@@ -152,7 +152,7 @@ func (moves RayMoves) All() Bitboard {
 	return moves.Union()
 }
 
-func GetRayAttacks(index uint64) Bitboard {
+func GetRayMoves(index uint64) Bitboard {
 	if index >= 64 {
 		return EmptyBitboard()
 	}
@@ -160,28 +160,28 @@ func GetRayAttacks(index uint64) Bitboard {
 		Or(Rays.NE[index]).Or(Rays.NW[index]).Or(Rays.SE[index]).Or(Rays.SW[index])
 }
 
-func GetRayAttacksFromFileRank(file, rank int) Bitboard {
+func GetRayMovesFromFileRank(file, rank int) Bitboard {
 	if file < 0 || file >= 8 || rank < 0 || rank >= 8 {
 		return EmptyBitboard()
 	}
-	return GetRayAttacks(fileRankToIndex(file, rank))
+	return GetRayMoves(fileRankToIndex(file, rank))
 }
 
-func GetRayAttacksFromSquare(square string) Bitboard {
+func GetRayMovesFromSquare(square string) Bitboard {
 	file, rank, ok := squareToFileRank(square)
 	if !ok {
 		return EmptyBitboard()
 	}
-	return GetRayAttacksFromFileRank(file, rank)
+	return GetRayMovesFromFileRank(file, rank)
 }
 
-func PrintRayAttacks() {
-	fmt.Println("Ray Attacks (All directions):")
+func PrintRayMoves() {
+	fmt.Println("Ray Moves (All directions):")
 	fmt.Println("==============================")
 	for index := uint64(0); index < 64; index++ {
 		file, rank := indexToFileRank(index)
 		square := fmt.Sprintf("%c%d", 'a'+file, rank+1)
-		union := GetRayAttacks(index)
+		union := GetRayMoves(index)
 		fmt.Printf("Square %s (%d):\n", square, index)
 		fmt.Printf("  Bitboard:\n%s", union.String())
 		fmt.Printf("  Squares: %s\n", strings.Join(union.ToSquares(), " "))
@@ -189,6 +189,10 @@ func PrintRayAttacks() {
 	}
 }
 
+// GetValidRayMoves returns valid ray moves for a piece in each direction (N,E,S,W,NE,NW,SE,SW),
+// useful for generating queen, rook, and bishop moves.
+// Rays are truncated at the first blocker piece encountered. If the blocker is an enemy piece,
+// that square is included in the valid moves. If it's a friendly piece, that square is excluded.
 func GetValidRayMoves(pos *Position, piece *Piece) RayMoves {
 	if piece == nil || piece.Location.IsEmpty() {
 		return RayMoves{}
