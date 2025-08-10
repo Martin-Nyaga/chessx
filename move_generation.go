@@ -3,13 +3,15 @@ package main
 import "fmt"
 
 type GeneratedMove struct {
-	From      string
-	To        string
-	Notation  string
-	IsCapture bool
-	Promotion PieceKind
-	Kind      PieceKind
-	Color     Color
+	From       string
+	To         string
+	Notation   string
+	IsCapture  bool
+	Promotion  PieceKind
+	Kind       PieceKind
+	Color      Color
+	IsCastle   bool
+	CastleSide CastlingSide
 }
 
 func squareFromIndex(index uint64) string {
@@ -140,7 +142,58 @@ func generatePossibleMoves(pos *Position) []GeneratedMove {
 		}
 	}
 
+	// Castling moves (pseudo-legal; checks filtered later)
+	addCastlingMoves(pos, &moves)
+
 	return moves
+}
+
+// through squares for castling checks
+var (
+	whiteKingsideThrough  = []string{"e1", "f1", "g1"}
+	whiteQueensideThrough = []string{"e1", "d1", "c1"}
+	blackKingsideThrough  = []string{"e8", "f8", "g8"}
+	blackQueensideThrough = []string{"e8", "d8", "c8"}
+)
+
+// addCastlingMoves appends pseudo-legal castling moves to dst if available and path squares are empty
+func addCastlingMoves(pos *Position, dst *[]GeneratedMove) {
+	add := func(color Color, side CastlingSide, fromSq, toSq string, emptySquares []string, right CastlingSide, notation string) {
+		if pos.toMove != color || !pos.CanCastle(right) {
+			return
+		}
+		fromFile, fromRank, ok := squareToFileRank(fromSq)
+		if !ok {
+			return
+		}
+		king := pos.GetPiece(fromFile, fromRank)
+		if king == nil || king.Kind != King || king.Color != color {
+			return
+		}
+		for _, sq := range emptySquares {
+			f, r, ok2 := squareToFileRank(sq)
+			if !ok2 || pos.GetPiece(f, r) != nil {
+				return
+			}
+		}
+		*dst = append(*dst, GeneratedMove{
+			From:       fromSq,
+			To:         toSq,
+			Notation:   notation,
+			IsCapture:  false,
+			Promotion:  Empty,
+			Kind:       King,
+			Color:      color,
+			IsCastle:   true,
+			CastleSide: side,
+		})
+	}
+	// White
+	add(White, WhiteKingside, "e1", "g1", []string{"f1", "g1"}, WhiteKingside, "O-O")
+	add(White, WhiteQueenside, "e1", "c1", []string{"b1", "c1", "d1"}, WhiteQueenside, "O-O-O")
+	// Black
+	add(Black, BlackKingside, "e8", "g8", []string{"f8", "g8"}, BlackKingside, "O-O")
+	add(Black, BlackQueenside, "e8", "c8", []string{"b8", "c8", "d8"}, BlackQueenside, "O-O-O")
 }
 
 type AppliedMove struct {
@@ -155,8 +208,15 @@ func generateLegalMoves(pos *Position) []AppliedMove {
 	legal := make([]AppliedMove, 0, len(possible))
 	for _, mv := range possible {
 		after := pos.ApplyMove(mv)
+		// Filter moves that leave king in check
 		if after.IsKingInCheck(mv.Color) {
 			continue
+		}
+		// For castling, ensure not castling through check
+		if mv.IsCastle {
+			if pos.IsCastlingThroughCheck(mv.Color, mv.CastleSide) {
+				continue
+			}
 		}
 		legal = append(legal, AppliedMove{Move: mv, Position: after})
 	}

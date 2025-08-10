@@ -12,11 +12,14 @@ const (
 	Black
 )
 
+// CastlingSide represents a specific castling right bit value stored in Position.castling
+type CastlingSide byte
+
 const (
-	WhiteKingside  = 1 << 0
-	WhiteQueenside = 1 << 1
-	BlackKingside  = 1 << 2
-	BlackQueenside = 1 << 3
+	WhiteKingside  CastlingSide = 1 << 0
+	WhiteQueenside CastlingSide = 1 << 1
+	BlackKingside  CastlingSide = 1 << 2
+	BlackQueenside CastlingSide = 1 << 3
 )
 
 type PieceKind int
@@ -176,7 +179,54 @@ func (p *Position) ApplyMove(move GeneratedMove) *Position {
 		}
 	}
 
-	// Move the piece
+	// Move the piece (handle castling specially)
+	if move.IsCastle {
+		// Move king
+		newPosition.SetPiece(fromFile, fromRank, Empty, move.Color)
+		newPosition.SetPiece(toFile, toRank, King, move.Color)
+		// Move rook accordingly
+		if move.Color == White {
+			if move.CastleSide == WhiteKingside {
+				// rook h1 -> f1
+				newPosition.SetPiece(7, 0, Empty, White)
+				newPosition.SetPiece(5, 0, Rook, White)
+			} else {
+				// rook a1 -> d1
+				newPosition.SetPiece(0, 0, Empty, White)
+				newPosition.SetPiece(3, 0, Rook, White)
+			}
+			newPosition.SetCastling(WhiteKingside, false)
+			newPosition.SetCastling(WhiteQueenside, false)
+		} else {
+			if move.CastleSide == BlackKingside {
+				// rook h8 -> f8
+				newPosition.SetPiece(7, 7, Empty, Black)
+				newPosition.SetPiece(5, 7, Rook, Black)
+			} else {
+				// rook a8 -> d8
+				newPosition.SetPiece(0, 7, Empty, Black)
+				newPosition.SetPiece(3, 7, Rook, Black)
+			}
+			newPosition.SetCastling(BlackKingside, false)
+			newPosition.SetCastling(BlackQueenside, false)
+		}
+		// No captures, en passant, or promotion during castling
+		captured = false
+		// Halfmove clock increments by 1 (not a pawn move or capture)
+		newPosition.halfmoves = p.halfmoves + 1
+		// Side to move and move number
+		if p.toMove == Black {
+			newPosition.moveNumber = p.moveNumber + 1
+		} else {
+			newPosition.moveNumber = p.moveNumber
+		}
+		if p.toMove == White {
+			newPosition.toMove = Black
+		} else {
+			newPosition.toMove = White
+		}
+		return newPosition
+	}
 	newPosition.SetPiece(fromFile, fromRank, Empty, move.Color)
 	movedKind := move.Kind
 	if movedKind == Pawn && move.Promotion != Empty {
@@ -264,6 +314,49 @@ func (p *Position) IsKingInCheck(color Color) bool {
 	return false
 }
 
+// IsCastleThroughCheck returns true if any intermediate square the king passes through
+// (including the destination) is attacked for the given castling move.
+func (p *Position) IsCastlingThroughCheck(color Color, side CastlingSide) bool {
+	// Determine squares to test
+	var throughSquares []string
+	if color == White {
+		if side == WhiteKingside {
+			throughSquares = whiteKingsideThrough
+		} else {
+			throughSquares = whiteQueensideThrough
+		}
+	} else {
+		if side == BlackKingside {
+			throughSquares = blackKingsideThrough
+		} else {
+			throughSquares = blackQueensideThrough
+		}
+	}
+	for _, sq := range throughSquares {
+		f, r, ok := squareToFileRank(sq)
+		if !ok {
+			return true
+		}
+		// Temporarily place king at square and check attacks
+		// Clone to avoid mutating current position
+		tmp := p.Clone()
+		// Remove any king of this color
+		for i := range tmp.pieces {
+			piece := &tmp.pieces[i]
+			if piece.Color == color && piece.Kind == King && !piece.Location.IsEmpty() {
+				file, rank := indexToFileRank(piece.Location.FirstSet())
+				tmp.SetPiece(file, rank, Empty, color)
+				break
+			}
+		}
+		tmp.SetPiece(f, r, King, color)
+		if tmp.IsKingInCheck(color) {
+			return true
+		}
+	}
+	return false
+}
+
 func (p *Position) SetPiece(file, rank int, kind PieceKind, color Color) {
 	if file < 0 || file >= 8 || rank < 0 || rank >= 8 {
 		return
@@ -332,15 +425,15 @@ func (p *Position) SetMoveNumber(moveNumber int) {
 	p.moveNumber = moveNumber
 }
 
-func (p *Position) CanCastle(right byte) bool {
-	return p.castling&right != 0
+func (p *Position) CanCastle(right CastlingSide) bool {
+	return p.castling&byte(right) != 0
 }
 
-func (p *Position) SetCastling(right byte, available bool) {
+func (p *Position) SetCastling(right CastlingSide, available bool) {
 	if available {
-		p.castling |= right
+		p.castling |= byte(right)
 	} else {
-		p.castling &^= right
+		p.castling &^= byte(right)
 	}
 }
 
