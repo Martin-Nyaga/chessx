@@ -7,6 +7,7 @@ type GeneratedMove struct {
 	To        string
 	Notation  string
 	IsCapture bool
+	Promotion PieceKind
 }
 
 func squareFromIndex(index uint64) string {
@@ -53,22 +54,22 @@ func generateLegalMoves(pos *Position) []GeneratedMove {
 		fromSquare := squareFromIndex(fromIndex)
 
 		var destinations Bitboard
-    switch piece.Kind {
-    case Knight:
-        destinations = GetPossibleKnightMoves(pos, piece)
-    case King:
-        destinations = GetPossibleKingMoves(pos, piece)
-    case Rook:
-        destinations = GetPossibleRayMoves(pos, piece).Orthogonal()
-    case Bishop:
-        destinations = GetPossibleRayMoves(pos, piece).Diagonal()
-    case Queen:
-        destinations = GetPossibleRayMoves(pos, piece).All()
-    case Pawn:
-        destinations = GetPossiblePawnMoves(pos, piece)
-    default:
-        destinations = EmptyBitboard()
-    }
+		switch piece.Kind {
+		case Knight:
+			destinations = GetPossibleKnightMoves(pos, piece)
+		case King:
+			destinations = GetPossibleKingMoves(pos, piece)
+		case Rook:
+			destinations = GetPossibleRayMoves(pos, piece).Orthogonal()
+		case Bishop:
+			destinations = GetPossibleRayMoves(pos, piece).Diagonal()
+		case Queen:
+			destinations = GetPossibleRayMoves(pos, piece).All()
+		case Pawn:
+			destinations = GetPossiblePawnMoves(pos, piece)
+		default:
+			destinations = EmptyBitboard()
+		}
 
 		for _, toIndex := range destinations.ToIndexes() {
 			toSquare := squareFromIndex(toIndex)
@@ -79,6 +80,31 @@ func generateLegalMoves(pos *Position) []GeneratedMove {
 				isCapture = enemyOccupancy.IsSet(toIndex) || (!pos.GetEnpassant().IsEmpty() && pos.GetEnpassant().IsSet(toIndex))
 			} else {
 				isCapture = enemyOccupancy.IsSet(toIndex)
+			}
+
+			// Handle pawn promotions: when a pawn moves to last rank, emit 4 promotion variants
+			if piece.Kind == Pawn {
+				_, toRank := indexToFileRank(toIndex)
+				isPromotionRank := (piece.Color == White && toRank == 7) || (piece.Color == Black && toRank == 0)
+				if isPromotionRank {
+					promotionKinds := []PieceKind{Rook, Bishop, Knight, Queen}
+					for _, promo := range promotionKinds {
+						var notation string
+						if isCapture {
+							notation = fmt.Sprintf("%cx%s=%s", fromSquare[0], toSquare, pieceSANLetter(promo))
+						} else {
+							notation = fmt.Sprintf("%s=%s", toSquare, pieceSANLetter(promo))
+						}
+						moves = append(moves, GeneratedMove{
+							From:      fromSquare,
+							To:        toSquare,
+							Notation:  notation,
+							IsCapture: isCapture,
+							Promotion: promo,
+						})
+					}
+					continue
+				}
 			}
 
 			notation := ""
@@ -103,6 +129,7 @@ func generateLegalMoves(pos *Position) []GeneratedMove {
 				To:        toSquare,
 				Notation:  notation,
 				IsCapture: isCapture,
+				Promotion: Empty,
 			})
 		}
 	}
