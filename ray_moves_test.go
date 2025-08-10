@@ -137,7 +137,7 @@ func TestGetValidMoves(t *testing.T) {
 		pos.SetPieceAtSquare("c3", Pawn, White)
 
 		bishop := pos.GetPieceAtSquare("a1")
-		moves := GetValidRayMoves(pos, bishop)
+        moves := GetPossibleRayMoves(pos, bishop)
 		squares := moves.Diagonal().ToSquares()
 
 		expected := []string{"b2"}
@@ -165,7 +165,7 @@ func TestGetValidMoves(t *testing.T) {
 		pos.SetPieceAtSquare("a2", Pawn, White)
 
 		rook := pos.GetPieceAtSquare("a1")
-		moves := GetValidRayMoves(pos, rook)
+        moves := GetPossibleRayMoves(pos, rook)
 		squares := moves.Orthogonal().ToSquares()
 
 		expected := []string{"b1"}

@@ -53,22 +53,22 @@ func generateLegalMoves(pos *Position) []GeneratedMove {
 		fromSquare := squareFromIndex(fromIndex)
 
 		var destinations Bitboard
-		switch piece.Kind {
-		case Knight:
-			destinations = GetValidKnightMoves(pos, piece)
-		case King:
-			destinations = GetValidKingMoves(pos, piece)
-		case Rook:
-			destinations = GetValidRayMoves(pos, piece).Orthogonal()
-		case Bishop:
-			destinations = GetValidRayMoves(pos, piece).Diagonal()
-		case Queen:
-			destinations = GetValidRayMoves(pos, piece).All()
-		case Pawn:
-			destinations = GetValidPawnMoves(pos, piece)
-		default:
-			destinations = EmptyBitboard()
-		}
+    switch piece.Kind {
+    case Knight:
+        destinations = GetPossibleKnightMoves(pos, piece)
+    case King:
+        destinations = GetPossibleKingMoves(pos, piece)
+    case Rook:
+        destinations = GetPossibleRayMoves(pos, piece).Orthogonal()
+    case Bishop:
+        destinations = GetPossibleRayMoves(pos, piece).Diagonal()
+    case Queen:
+        destinations = GetPossibleRayMoves(pos, piece).All()
+    case Pawn:
+        destinations = GetPossiblePawnMoves(pos, piece)
+    default:
+        destinations = EmptyBitboard()
+    }
 
 		for _, toIndex := range destinations.ToIndexes() {
 			toSquare := squareFromIndex(toIndex)

@@ -3,7 +3,7 @@ package main
 // GetValidPawnMoves returns legal pawn moves for the given pawn piece.
 // Includes single/double pushes (if empty), captures, and en passant (if available in position).
 // Assumes standard chess with white pawns moving towards increasing ranks (north).
-func GetValidPawnMoves(pos *Position, piece *Piece) Bitboard {
+func GetPossiblePawnMoves(pos *Position, piece *Piece) Bitboard {
 	if piece == nil || piece.Location.IsEmpty() || piece.Kind != Pawn {
 		return EmptyBitboard()
 	}

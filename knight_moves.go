@@ -49,7 +49,7 @@ func GetKnightMovesFromSquare(square string) Bitboard {
 
 // GetValidKnightMoves returns all squares a given knight piece can legally move to,
 // excluding squares occupied by own pieces. Enemy-occupied squares are included.
-func GetValidKnightMoves(pos *Position, piece *Piece) Bitboard {
+func GetPossibleKnightMoves(pos *Position, piece *Piece) Bitboard {
 	if piece == nil || piece.Location.IsEmpty() {
 		return EmptyBitboard()
 	}

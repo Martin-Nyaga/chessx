@@ -33,13 +33,13 @@ func TestKingMoves_Basic(t *testing.T) {
 	}
 }
 
-func TestGetValidKingMoves(t *testing.T) {
+func TestGetPossibleKingMoves(t *testing.T) {
 	pos := NewPosition()
 	pos.SetPieceAtSquare("e4", King, White)
 	pos.SetPieceAtSquare("e5", Pawn, White)
 	pos.SetPieceAtSquare("f5", Pawn, Black)
 	king := pos.GetPieceAtSquare("e4")
-	moves := GetValidKingMoves(pos, king).ToSquares()
+    moves := GetPossibleKingMoves(pos, king).ToSquares()
 	sort.Strings(moves)
 	expected := []string{"d3", "e3", "f3", "d4", "f4", "d5", "f5"}
 	sort.Strings(expected)

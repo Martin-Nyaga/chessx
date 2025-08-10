@@ -44,7 +44,7 @@ func GetKingMovesFromSquare(square string) Bitboard {
 	return GetKingMovesFromFileRank(file, rank)
 }
 
-func GetValidKingMoves(pos *Position, piece *Piece) Bitboard {
+func GetPossibleKingMoves(pos *Position, piece *Piece) Bitboard {
 	if piece == nil || piece.Location.IsEmpty() {
 		return EmptyBitboard()
 	}

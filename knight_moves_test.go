@@ -35,7 +35,7 @@ func TestKnightMoves_Basic(t *testing.T) {
 	}
 }
 
-func TestGetValidKnightMoves(t *testing.T) {
+func TestGetPossibleKnightMoves(t *testing.T) {
 	pos := NewPosition()
 	pos.SetPieceAtSquare("e4", Knight, White)
 	pos.SetPieceAtSquare("c3", Pawn, White) // own blocker
@@ -44,7 +44,7 @@ func TestGetValidKnightMoves(t *testing.T) {
 	pos.SetPieceAtSquare("g5", Pawn, Black) // capturable
 
 	knight := pos.GetPieceAtSquare("e4")
-	moves := GetValidKnightMoves(pos, knight)
+    moves := GetPossibleKnightMoves(pos, knight)
 	got := moves.ToSquares()
 	sort.Strings(got)
 	expected := []string{"c5", "d2", "d6", "f2", "g3", "g5"}

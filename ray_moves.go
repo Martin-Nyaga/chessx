@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type RayMovesLookup struct {
+type AllRayMoves struct {
 	N  [64]Bitboard
 	E  [64]Bitboard
 	S  [64]Bitboard
@@ -16,7 +16,7 @@ type RayMovesLookup struct {
 	SW [64]Bitboard
 }
 
-var Rays RayMovesLookup
+var Rays AllRayMoves
 
 func init() {
 	for index := uint64(0); index < 64; index++ {
@@ -193,7 +193,7 @@ func PrintRayMoves() {
 // useful for generating queen, rook, and bishop moves.
 // Rays are truncated at the first blocker piece encountered. If the blocker is an enemy piece,
 // that square is included in the valid moves. If it's a friendly piece, that square is excluded.
-func GetValidRayMoves(pos *Position, piece *Piece) RayMoves {
+func GetPossibleRayMoves(pos *Position, piece *Piece) RayMoves {
 	if piece == nil || piece.Location.IsEmpty() {
 		return RayMoves{}
 	}
