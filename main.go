@@ -18,14 +18,16 @@ func main() {
 	fmt.Println("Starting Position:")
 	fmt.Println(pos.String())
 
-	fmt.Printf("Generating legal moves for %s (ignoring checks)...\n\n", colorToString(pos.toMove))
+	fmt.Printf("Generating legal moves for %s...\n\n", colorToString(pos.toMove))
 
-	moves := generateLegalMoves(pos)
-	for _, m := range moves {
+	legal := generateLegalMoves(pos)
+	for _, item := range legal {
+		m := item.Move
 		capMark := ""
 		if m.IsCapture {
 			capMark = " (capture)"
 		}
 		fmt.Printf("%s -> %s  %s%s\n", m.From, m.To, m.Notation, capMark)
+		fmt.Println(item.Position.String())
 	}
 }

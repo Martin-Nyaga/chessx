@@ -214,6 +214,56 @@ func (p *Position) ApplyMove(move GeneratedMove) *Position {
 	return newPosition
 }
 
+// IsKingInCheck returns true if the specified color's king is attacked in this position.
+func (p *Position) IsKingInCheck(color Color) bool {
+	if p == nil {
+		return false
+	}
+	// Find king index
+	var kingIndex uint64 = ^uint64(0)
+	for i := range p.pieces {
+		piece := &p.pieces[i]
+		if piece.Color == color && piece.Kind == King && !piece.Location.IsEmpty() {
+			kingIndex = piece.Location.FirstSet()
+			break
+		}
+	}
+	if kingIndex == ^uint64(0) {
+		return true
+	}
+	enemy := White
+	if color == White {
+		enemy = Black
+	}
+	for i := range p.pieces {
+		piece := &p.pieces[i]
+		if piece.Color != enemy || piece.Location.IsEmpty() {
+			continue
+		}
+		var attacks Bitboard
+		switch piece.Kind {
+		case Knight:
+			attacks = GetPossibleKnightMoves(p, piece)
+		case King:
+			attacks = GetPossibleKingMoves(p, piece)
+		case Rook:
+			attacks = GetPossibleRayMoves(p, piece).Orthogonal()
+		case Bishop:
+			attacks = GetPossibleRayMoves(p, piece).Diagonal()
+		case Queen:
+			attacks = GetPossibleRayMoves(p, piece).All()
+		case Pawn:
+			attacks = GetPossiblePawnMoves(p, piece)
+		default:
+			attacks = EmptyBitboard()
+		}
+		if attacks.IsSet(kingIndex) {
+			return true
+		}
+	}
+	return false
+}
+
 func (p *Position) SetPiece(file, rank int, kind PieceKind, color Color) {
 	if file < 0 || file >= 8 || rank < 0 || rank >= 8 {
 		return

@@ -34,9 +34,9 @@ func pieceSANLetter(kind PieceKind) string {
 	}
 }
 
-// generateLegalMoves enumerates pseudo-legal moves for the side to move (ignores checks)
+// generatePossibleMoves enumerates pseudo-legal moves for the side to move (ignores checks)
 // and returns them with simple SAN-like notation (captures marked with 'x').
-func generateLegalMoves(pos *Position) []GeneratedMove {
+func generatePossibleMoves(pos *Position) []GeneratedMove {
 	var moves []GeneratedMove
 
 	var enemyOccupancy Bitboard
@@ -141,4 +141,24 @@ func generateLegalMoves(pos *Position) []GeneratedMove {
 	}
 
 	return moves
+}
+
+type AppliedMove struct {
+	Move     GeneratedMove
+	Position *Position
+}
+
+// generateLegalMoves enumerates legal moves by filtering out pseudo-legal moves that
+// leave the moving side's king in check. Returns each move paired with its resulting position.
+func generateLegalMoves(pos *Position) []AppliedMove {
+	possible := generatePossibleMoves(pos)
+	legal := make([]AppliedMove, 0, len(possible))
+	for _, mv := range possible {
+		after := pos.ApplyMove(mv)
+		if after.IsKingInCheck(mv.Color) {
+			continue
+		}
+		legal = append(legal, AppliedMove{Move: mv, Position: after})
+	}
+	return legal
 }

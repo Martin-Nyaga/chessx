@@ -11,7 +11,7 @@ func TestGenerateLegalMoves_StartingPositionWhite(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to parse fen: %v", err)
 	}
-	got := generateLegalMoves(pos)
+	got := generatePossibleMoves(pos)
 	if len(got) != 20 {
 		t.Fatalf("expected 20 moves, got %d", len(got))
 	}
@@ -42,7 +42,7 @@ func TestGenerateLegalMoves_RookCaptureFiltering(t *testing.T) {
 	pos.SetPieceAtSquare("a2", Pawn, White)
 	pos.SetToMove(White)
 
-	got := generateLegalMoves(pos)
+	got := generatePossibleMoves(pos)
 	// Only one rook move: capture on b1
 	found := false
 	for _, m := range got {
@@ -69,7 +69,7 @@ func TestGenerateLegalMoves_PawnCaptureAndEnPassant(t *testing.T) {
 	pos.SetEnpassant(fileRankToIndex(3, 5)) // d6
 	pos.SetToMove(White)
 
-	got := generateLegalMoves(pos)
+	got := generatePossibleMoves(pos)
 	notations := map[string]GeneratedMove{}
 	for _, m := range got {
 		notations[m.Notation] = m
@@ -94,7 +94,11 @@ func TestGenerateLegalMoves_BlackStartingMoves(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to parse fen: %v", err)
 	}
-	moves := generateLegalMoves(pos)
+	applied := generateLegalMoves(pos)
+	moves := make([]GeneratedMove, 0, len(applied))
+	for _, ap := range applied {
+		moves = append(moves, ap.Move)
+	}
 	if len(moves) != 20 {
 		t.Fatalf("expected 20 moves for black, got %d", len(moves))
 	}
