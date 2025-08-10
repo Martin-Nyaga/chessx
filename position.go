@@ -65,6 +65,155 @@ func NewPosition() *Position {
 
 // moved to board_utils.go: fileRankToIndex, indexToFileRank
 
+// Clone returns a deep copy of the position.
+func (p *Position) Clone() *Position {
+	if p == nil {
+		return nil
+	}
+	newPosition := &Position{
+		pieces:         make([]Piece, len(p.pieces)),
+		board:          p.board,
+		toMove:         p.toMove,
+		moveNumber:     p.moveNumber,
+		castling:       p.castling,
+		enpassant:      p.enpassant,
+		halfmoves:      p.halfmoves,
+		whiteOccupancy: p.whiteOccupancy,
+		blackOccupancy: p.blackOccupancy,
+	}
+	copy(newPosition.pieces, p.pieces)
+	return newPosition
+}
+
+// ApplyMove returns a new position with the given move applied.
+// Supports captures, en passant, promotions, en passant availability, halfmove clock, move number, and castling rights updates.
+func (p *Position) ApplyMove(move GeneratedMove) *Position {
+	if p == nil {
+		return nil
+	}
+	newPosition := p.Clone()
+
+	fromFile, fromRank, okFrom := squareToFileRank(move.From)
+	toFile, toRank, okTo := squareToFileRank(move.To)
+	if !okFrom || !okTo {
+		return newPosition
+	}
+
+	occupant := newPosition.GetPiece(fromFile, fromRank)
+	if occupant == nil {
+		return newPosition
+	}
+
+	// Reset en passant by default; set if double pawn push occurs below
+	newPosition.enpassant = EmptyBitboard()
+
+	// Determine if this is an en passant capture on the current position
+	isEnPassantCapture := false
+	if move.Kind == Pawn && !p.enpassant.IsEmpty() {
+		epIndex := p.enpassant.FirstSet()
+		if epIndex == fileRankToIndex(toFile, toRank) && newPosition.GetPiece(toFile, toRank) == nil {
+			isEnPassantCapture = true
+		}
+	}
+
+	// Handle captures
+	captured := false
+	if isEnPassantCapture {
+		captured = true
+		capRank := toRank - 1
+		if move.Color == Black {
+			capRank = toRank + 1
+		}
+		newPosition.SetPiece(toFile, capRank, Empty, White)
+	} else if newPosition.GetPiece(toFile, toRank) != nil {
+		captured = true
+	}
+
+	// Update castling rights for king/rook moves and rook captures
+	// King moves: clear both rights for that color
+	if move.Kind == King {
+		if move.Color == White {
+			newPosition.SetCastling(WhiteKingside, false)
+			newPosition.SetCastling(WhiteQueenside, false)
+		} else {
+			newPosition.SetCastling(BlackKingside, false)
+			newPosition.SetCastling(BlackQueenside, false)
+		}
+	}
+	// Rook moves from original squares
+	if move.Kind == Rook {
+		if move.Color == White && fromRank == 0 {
+			if fromFile == 0 {
+				newPosition.SetCastling(WhiteQueenside, false)
+			} else if fromFile == 7 {
+				newPosition.SetCastling(WhiteKingside, false)
+			}
+		} else if move.Color == Black && fromRank == 7 {
+			if fromFile == 0 {
+				newPosition.SetCastling(BlackQueenside, false)
+			} else if fromFile == 7 {
+				newPosition.SetCastling(BlackKingside, false)
+			}
+		}
+	}
+	// Rook captured on original squares
+	if captured && !isEnPassantCapture {
+		// Check original board (p) to see captured piece color/kind
+		if capPiece := p.GetPiece(toFile, toRank); capPiece != nil && capPiece.Kind == Rook {
+			if capPiece.Color == White && toRank == 0 {
+				if toFile == 0 {
+					newPosition.SetCastling(WhiteQueenside, false)
+				} else if toFile == 7 {
+					newPosition.SetCastling(WhiteKingside, false)
+				}
+			} else if capPiece.Color == Black && toRank == 7 {
+				if toFile == 0 {
+					newPosition.SetCastling(BlackQueenside, false)
+				} else if toFile == 7 {
+					newPosition.SetCastling(BlackKingside, false)
+				}
+			}
+		}
+	}
+
+	// Move the piece
+	newPosition.SetPiece(fromFile, fromRank, Empty, move.Color)
+	movedKind := move.Kind
+	if movedKind == Pawn && move.Promotion != Empty {
+		movedKind = move.Promotion
+	}
+	newPosition.SetPiece(toFile, toRank, movedKind, move.Color)
+
+	// En passant availability after a double pawn push
+	if move.Kind == Pawn {
+		if dr := toRank - fromRank; dr == 2 || dr == -2 {
+			midRank := (toRank + fromRank) / 2
+			newPosition.SetEnpassant(fileRankToIndex(toFile, midRank))
+		}
+	}
+
+	// Halfmove clock
+	if move.Kind == Pawn || captured {
+		newPosition.halfmoves = 0
+	} else {
+		newPosition.halfmoves = p.halfmoves + 1
+	}
+
+	// Side to move and move number
+	if p.toMove == Black {
+		newPosition.moveNumber = p.moveNumber + 1
+	} else {
+		newPosition.moveNumber = p.moveNumber
+	}
+	if p.toMove == White {
+		newPosition.toMove = Black
+	} else {
+		newPosition.toMove = White
+	}
+
+	return newPosition
+}
+
 func (p *Position) SetPiece(file, rank int, kind PieceKind, color Color) {
 	if file < 0 || file >= 8 || rank < 0 || rank >= 8 {
 		return

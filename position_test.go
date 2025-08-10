@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 	"testing"
 )
 
@@ -429,5 +430,86 @@ func TestOccupancyBitboardsWithFEN(t *testing.T) {
 	}
 	if allOccupancy2.Count() != whitePieces+blackPieces {
 		t.Errorf("Expected %d total pieces, got %d", whitePieces+blackPieces, allOccupancy2.Count())
+	}
+}
+
+func TestApplyMove_PawnPromotionVariants(t *testing.T) {
+	pos := NewPosition()
+	pos.SetPieceAtSquare("e7", Pawn, White)
+	pos.SetToMove(White)
+
+	gen := GeneratedMove{From: "e7", To: "e8", Notation: "e8=Q", IsCapture: false, Promotion: Queen, Kind: Pawn, Color: White}
+	next := pos.ApplyMove(gen)
+	if p := next.GetPieceAtSquare("e8"); p == nil || p.Kind != Queen || p.Color != White {
+		t.Fatalf("expected white queen on e8 after promotion, got %+v", p)
+	}
+	if next.GetPieceAtSquare("e7") != nil {
+		t.Fatalf("pawn should have moved from e7")
+	}
+}
+
+func TestApplyMove_EnPassantCapture(t *testing.T) {
+	pos := NewPosition()
+	pos.SetPieceAtSquare("e5", Pawn, White)
+	pos.SetPieceAtSquare("d5", Pawn, Black)
+	pos.SetEnpassant(fileRankToIndex(3, 5)) // d6
+	pos.SetToMove(White)
+
+	gen := GeneratedMove{From: "e5", To: "d6", Notation: "exd6", IsCapture: true, Promotion: Empty, Kind: Pawn, Color: White}
+	next := pos.ApplyMove(gen)
+	if p := next.GetPieceAtSquare("d6"); p == nil || p.Kind != Pawn || p.Color != White {
+		t.Fatalf("expected white pawn on d6 after en passant, got %+v", p)
+	}
+	if p := next.GetPieceAtSquare("d5"); p != nil {
+		t.Fatalf("black pawn on d5 should be captured en passant")
+	}
+}
+
+func TestApplyMove_CastlingRightsClearedOnKingRookMoveAndCapture(t *testing.T) {
+	pos := NewPosition()
+	pos.SetPieceAtSquare("e1", King, White)
+	pos.SetPieceAtSquare("a1", Rook, White)
+	pos.SetPieceAtSquare("h1", Rook, White)
+	pos.SetCastling(WhiteKingside, true)
+	pos.SetCastling(WhiteQueenside, true)
+	pos.SetToMove(White)
+
+	next := pos.ApplyMove(GeneratedMove{From: "e1", To: "e2", Notation: "Ke2", Kind: King, Color: White})
+	if next.CanCastle(WhiteKingside) || next.CanCastle(WhiteQueenside) {
+		t.Fatalf("castling rights should be cleared after king moves")
+	}
+
+	pos2 := NewPosition()
+	pos2.SetPieceAtSquare("a1", Rook, White)
+	pos2.SetCastling(WhiteQueenside, true)
+	pos2.SetToMove(White)
+	next2 := pos2.ApplyMove(GeneratedMove{From: "a1", To: "a2", Notation: "Ra2", Kind: Rook, Color: White})
+	if next2.CanCastle(WhiteQueenside) {
+		t.Fatalf("queen-side castling right should be cleared after rook moves from a1")
+	}
+}
+
+func TestApplyMove_EnPassantAvailabilityOnDoublePush(t *testing.T) {
+	pos := NewPosition()
+	pos.SetPieceAtSquare("e2", Pawn, White)
+	pos.SetToMove(White)
+	next := pos.ApplyMove(GeneratedMove{From: "e2", To: "e4", Notation: "e4", Kind: Pawn, Color: White})
+	sqs := next.GetEnpassant().ToSquares()
+	sort.Strings(sqs)
+	if len(sqs) != 1 || sqs[0] != "e3" {
+		t.Fatalf("expected en passant square e3, got %v", sqs)
+	}
+}
+
+func TestApplyMove_HalfmoveClock(t *testing.T) {
+	pos := NewPosition()
+	pos.SetPieceAtSquare("e2", Pawn, White)
+	pos.SetPieceAtSquare("a7", Pawn, Black)
+	pos.SetToMove(White)
+	pos.SetHalfmoves(10)
+
+	next := pos.ApplyMove(GeneratedMove{From: "e2", To: "e4", Notation: "e4", Kind: Pawn, Color: White})
+	if next.GetHalfmoves() != 0 {
+		t.Fatalf("expected halfmoves reset to 0 after pawn move, got %d", next.GetHalfmoves())
 	}
 }

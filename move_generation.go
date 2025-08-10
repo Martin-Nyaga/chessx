@@ -8,6 +8,8 @@ type GeneratedMove struct {
 	Notation  string
 	IsCapture bool
 	Promotion PieceKind
+	Kind      PieceKind
+	Color     Color
 }
 
 func squareFromIndex(index uint64) string {
@@ -101,6 +103,8 @@ func generateLegalMoves(pos *Position) []GeneratedMove {
 							Notation:  notation,
 							IsCapture: isCapture,
 							Promotion: promo,
+							Kind:      piece.Kind,
+							Color:     piece.Color,
 						})
 					}
 					continue
@@ -130,6 +134,8 @@ func generateLegalMoves(pos *Position) []GeneratedMove {
 				Notation:  notation,
 				IsCapture: isCapture,
 				Promotion: Empty,
+				Kind:      piece.Kind,
+				Color:     piece.Color,
 			})
 		}
 	}
