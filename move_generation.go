@@ -14,6 +14,24 @@ type GeneratedMove struct {
 	CastleSide CastlingSide
 }
 
+// UCINotation returns the move encoded in UCI format, e.g. e2e4, e7e8q.
+func (m GeneratedMove) UCINotation() string {
+	uci := m.From + m.To
+	if m.Promotion != Empty {
+		switch m.Promotion {
+		case Queen:
+			uci += "q"
+		case Rook:
+			uci += "r"
+		case Bishop:
+			uci += "b"
+		case Knight:
+			uci += "n"
+		}
+	}
+	return uci
+}
+
 func squareFromIndex(index uint64) string {
 	file, rank := indexToFileRank(index)
 	return fmt.Sprintf("%c%d", 'a'+file, rank+1)
