@@ -9,7 +9,6 @@ import (
 	"sort"
 	"strings"
 	"testing"
-	"time"
 )
 
 func engineLegalMovesUCI(pos *Position) []string {
@@ -107,8 +106,6 @@ func TestEngineMovesMatchStockfish_StartPosition(t *testing.T) {
 		t.Skip("CHESSX_STOCKFISH env not set; skipping Stockfish comparison test")
 		return
 	}
-
-	rand.Seed(time.Now().UnixNano())
 
 	// Start from initial position and empty history
 	pos, err := ParseFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
